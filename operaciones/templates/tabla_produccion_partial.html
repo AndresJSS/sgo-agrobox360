@@ -1,0 +1,187 @@
+<div class="table-responsive">    
+    <table class="table table-hover table-sm mb-0 tabla-compacta">
+        <thead class="table-light">
+            <tr>
+                <th>ID lote</th>
+                <th>Cultivo</th>
+                <th>Variedad</th>
+                <th>Fecha traspaso</th>
+                <th>No.Plantas</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in lista %}
+            <tr>
+                <td>{{ c.lote_id }}</td>
+                <td>{{ c.nombre }}</td>
+                <td class="fst-italic">{{ c.variedad}}</td>
+                <td>{{ c.fecha_traspaso_real|default:c.fecha_siembra|date:"d/m/Y" }}</td>
+                <td>{{ c.cantidad_bandejas }}</td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <button type="button" class="btn btn-outline-danger btn-sm py-0 border-0" data-bs-toggle="modal" data-bs-target="#edit{{ c.id }}" title="Editar">✏️</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm py-0 border-0" data-bs-toggle="modal" data-bs-target="#traspaso{{ c.id }}" title="Traspasar a otro sistema">🔄️</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm py-0 border-0" data-bs-toggle="modal" data-bs-target="#cosechar{{ c.id }}" title="Cosechar">✅</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm py-0 border-0" data-bs-toggle="modal" data-bs-target="#eliminar{{ c.id }}" title="Eliminar">🗑️</button>
+                    </div>
+
+                    <!--Modal para editar registro-->
+                    <div class="modal fade" id="edit{{ c.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-iica-blue text-white"><h6 class="modal-title">Editar {{ c.nombre }}/{{c.lote_id}}</h6><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                                <form action="{% url 'editar_cultivo' c.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <label class="small">Cultivo</label>
+                                        <select name="nombre" class="form-select mb-2">
+                                            <option value="Lechuga" {% if c.nombre == "Lechuga" %}selected{% endif %}>Lechuga</option>
+                                            <option value="Albahaca" {% if c.nombre == "Albahaca" %}selected{% endif %}>Albahaca</option>
+                                            <option value="Mostaza" {% if c.nombre == "Mostaza" %}selected{% endif %}>Mostaza</option>
+                                            <option value="Menta" {% if c.nombre == "Menta" %}selected{% endif %}>Menta</option>
+                                            <option value="Hierbabuena" {% if c.nombre == "Hierbabuena" %}selected{% endif %}>Hierbabuena</option>
+                                        </select>
+                                        <label class="small">Variedad</label><input type="text" name="variedad" class="form-control mb-2" value="{{ c.variedad }}">
+                                        <label class="small">Ubicación actual</label>
+                                        <select name="subsistema" class="form-select mb-2">
+                                            <option value="MAD-R1" {% if c.subsistema == "MAD-R1" %}selected{% endif %}>Maduración - Rack I</option>
+                                            <option value="MAD-R2" {% if c.subsistema == "MAD-R2" %}selected{% endif %}>Maduración - Rack II</option>
+                                            <option value="MAD-R3" {% if c.subsistema == "MAD-R3" %}selected{% endif %}>Maduración - Rack III</option>
+                                            <option value="MAD-R4" {% if c.subsistema == "MAD-R4" %}selected{% endif %}>Maduración - Rack IV</option>
+                                            <option value="VER-1" {% if c.subsistema == "VER-1" %}selected{% endif %}>Vertical Wall - I</option>
+                                            <option value="VER-2" {% if c.subsistema == "VER-2" %}selected{% endif %}>Vertical Wall - II</option>
+                                        </select>
+                                        <label class="small">Fecha ingreso</label><input type="date" name="fecha_traspaso" class="form-control mb-2" value="{{ c.fecha_traspaso_real|date:'Y-m-d' }}">
+                                        <label class="small">No.Plantas</label><input type="number" name="cantidad_bandejas" class="form-control mb-2" value="{{ c.cantidad_bandejas }}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn bg-iica-green text-white">Guardar cambios</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Modal para traspasar registro-->
+                    <div class="modal fade" id="traspaso{{ c.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-iica-blue text-white"><h6 class="modal-title">Traspasar sistema {{ c.nombre }}/{{c.lote_id}}</h6><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                                <form action="{% url 'traspaso_sistema' c.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <label class="small">Nuevo sistema</label>
+                                        <select name="nuevo_subsistema" class="form-select mb-2" required>
+                                            <optgroup label="Maduración">
+                                                <option value="MAD-R1">Rack I</option>
+                                                <option value="MAD-R2">Rack II</option>
+                                                <option value="MAD-R3">Rack III</option>
+                                                <option value="MAD-R4">Rack IV</option>
+                                            </optgroup>
+                                            <optgroup label="Vertical Wall">
+                                                <option value="VER-1">Vertical I</option>
+                                                <option value="VER-2">Vertical II</option>
+                                            </optgroup>
+                                        </select>
+                                        <label class="small">Fecha ingreso</label><input type="date" name="fecha_traspaso" class="form-control mb-2" value="{{ c.fecha_traspaso_real|date:'Y-m-d' }}">
+                                        <label class="small">No.Plantas</label><input type="number" name="cantidad_bandejas" class="form-control mb-2" value="{{ c.cantidad_bandejas }}" required>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn bg-iica-green text-white">Confirmar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Modal para cosechar registro-->
+                    <div class="modal fade" id="cosechar{{ c.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <div class="modal-header bg-iica-blue text-white">
+                                    <h6 class="modal-title">Cosechar cultivo {{ c.nombre }}/{{c.lote_id}}</h6>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <form action="{% url 'cosechar_cultivo' c.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="mb-4">
+                                            <p class="mb-1">ID Lote: <strong>{{c.lote_id}}</strong></p>
+                                            <p class="mb-1">Cultivo: <strong>{{c.nombre}}</strong></p>
+                                            <p class="mb-1">Variedad: <strong class="fst-italic">{{ c.variedad }}</strong></p>
+                                            <p class="mb-1">Fecha traspaso: <strong>{{c.fecha_traspaso_real|date:'d/m/Y'}}</strong></p>
+                                            <p class="mb-0">No.Plantas traspasadas: <strong>{{c.cantidad_bandejas}}</strong></p>
+                                            <div class="d-flex align-items-center mb-1">
+                                                <p class="mb-0 me-2">Fecha de cosecha:</p>
+                                                <input type="date" name="fecha_cosecha" class="form-control form-control-sm" style="width: 140px;" value="{% now 'Y-m-d' %}" required>
+                                            </div>
+
+                                            <div class="d-flex align-items-center mb-1">
+                                                <p class="mb-0 me-2">Plantas cosechas exitosamente:</p>
+                                                <input type="number" name="plantas_cosechadas" class="form-control form-control-sm d-inline-block input-cosecha"
+                                                    style="width: 80px;" min="0" max="{{c.cantidad_bandejas}}" required
+                                                    data-id="{{c.id}}" data-total="{{c.cantidad_bandejas}}">
+                                            </div>
+                                            
+                                            <div id="caja_rendimiento_{{c.id}}" class="mt-3 p-2 rounded-3 shadow-sm text-center border"
+                                                style="display: none; transition: all 0.3s ease;">
+                                                <span class="d-block text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px; opacity: 0.85;">
+                                                    Rendimiento de cosecha
+                                                </span>
+                                                <strong id="texto_rendimiento_{{c.id}}" class="display-6 fw-bold mb-0">0%</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn bg-iica-green text-white">Registrar cosecha</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <!--Modal para eliminar registro-->
+                    <div class="modal fade" id="eliminar{{ c.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-iica-blue text-white">
+                                    <h6 class="modal-title">Eliminar cultivo {{ c.nombre }}/{{c.lote_id}}</h6>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                                <form action="{% url 'eliminar_cultivo' c.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <p class="mb-1">ID Lote: <strong>{{c.lote_id}}</strong></p>
+                                        <p class="mb-1">Cultivo: <strong>{{c.nombre}}</strong></p>
+                                        <p class="mb-1">Variedad: <strong class="fst-italic">{{ c.variedad }}</strong></p>
+                                        <p class="mb-1">Fecha ingreso: <strong>{{c.fecha_traspaso_real|date:'d/m/Y'}}</strong></p>
+                                        <p class="mb-0">No.Plantas: <strong>{{c.cantidad_bandejas}}</strong></p>
+                                        <div class="mt-3 pt-3 border-top">
+                                            <label class="form-label fw-bold small text-secondary mb-1">Motivo de eliminación / Detalles (Opcional)</label>
+                                            <textarea name="detalles" class="form-control form-control-sm" rows="2" placeholder="Ej. Contaminación por hongos, daño en sistema de riego, etc."></textarea>
+                                            <div class="form-text" style="font-size: 0.7rem;">Este motivo quedará registrado en el historial de mermas.</div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn bg-iica-green text-white">Eliminar registro</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted small">No hay cultivos en este sistema.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

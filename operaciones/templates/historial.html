@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% load static %} 
+
+{% block content %}
+
+<div class="container">
+
+    <!--Sección superior para título y volver a panel principal-->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0 text-secondary">Registro Histórico</h4>
+        <a href="/" class="btn bg-iica-blue text-white shadow-sm">
+            <span style="font-size: 1.1rem;">⬅️</span> Volver al Panel Operativo
+        </a>
+    </div>
+
+    <!--Sección de mosaico con las opciones de tareas operativas-->
+    <div class="card shadow-sm border-0 bg-white">
+        <div class="card-body p-4">
+            
+            <ul class="nav nav-pills row g-3 mb-4" id="historialTabs" role="tablist">
+                <li class="col-md" role="presentation">
+                    <button class="nav-link active w-100 bg-transparent border-0" data-bs-toggle="pill" data-bs-target="#tab-registros" type="button" role="tab">
+                        <div class="card h-100 border-iica-green btn-historial-card">
+                            <div class="card-body py-3 text-center">
+                                <div class="fs-3 mb-1">🌱</div>
+                                <div class="text-dark">Registros</div>
+                            </div>
+                        </div>
+                    </button>
+                </li>
+                <li class="col-md" role="presentation">
+                    <button class="nav-link w-100 bg-transparent border-0" data-bs-toggle="pill" data-bs-target="#tab-traspasos" type="button" role="tab">
+                        <div class="card h-100 border-iica-green btn-historial-card">
+                            <div class="card-body py-3 text-center">
+                                <div class="fs-3 mb-1">🔄</div>
+                                <div class="text-dark">Traspasos</div>
+                            </div>
+                        </div>
+                    </button>
+                </li>
+                <li class="col-md" role="presentation">
+                    <button class="nav-link w-100 bg-transparent border-0" data-bs-toggle="pill" data-bs-target="#tab-ediciones" type="button" role="tab">
+                        <div class="card h-100 border-iica-green btn-historial-card">
+                            <div class="card-body py-3 text-center">
+                                <div class="fs-3 mb-1">✏️</div>
+                                <div class="text-dark">Ediciones</div>
+                            </div>
+                        </div>
+                    </button>
+                </li>
+                <li class="col-md" role="presentation">
+                    <button class="nav-link w-100 bg-transparent border-0" data-bs-toggle="pill" data-bs-target="#tab-cosechas" type="button" role="tab">
+                        <div class="card h-100 border-iica-green btn-historial-card">
+                            <div class="card-body py-3 text-center">
+                                <div class="fs-3 mb-1">✅</div>
+                                <div class="text-dark">Cosechas</div>
+                            </div>
+                        </div>
+                    </button>
+                </li>
+                <li class="col-md" role="presentation">
+                    <button class="nav-link w-100 bg-transparent border-0" data-bs-toggle="pill" data-bs-target="#tab-eliminaciones" type="button" role="tab">
+                        <div class="card h-100 border-iica-green btn-historial-card">
+                            <div class="card-body py-3 text-center">
+                                <div class="fs-3 mb-1">🗑️</div>
+                                <div class="text-dark">Eliminados</div>
+                            </div>
+                        </div>
+                    </button>
+                </li>
+            </ul>
+            
+            <!--Tablas de historial para cada sección del registro-->
+            <div class="tab-content border rounded p-3 bg-light" id="historialTabsContent">
+
+                <div class="tab-pane fade show active" id="tab-registros" role="tabpanel">
+                    <h5 class="text-dark mb-3">Historial de nuevos registros</h5>
+                    <div class="table-responsive bg-white rounded shadow-sm">
+                        <table class="table table-hover table-sm mb-0 tabla-compacta tabla-dinamica" id="tabla_historial_registros">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="small" style="width: 12%;">Fecha y hora</th>
+                                    <th class="small" style="width: 15%;">ID Lote</th>
+                                    <th class="small" style="width: 15%;">Cultivo (Variedad)</th>
+                                    <th class="small" style="width: 10%;">Fecha siembra</th>
+                                    <th class="small" style="width: 8%;">Sistema</th>
+                                    <th class="small" style="width: 10%; text-align: center;">Cantidad<br>bandejas/plantas</th>
+                                    <th class="small" style="width: 20%;">Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in registros %}
+                                <tr>
+                                    <td class="small">{{ item.fecha_hora|date:"d/m/Y H:i" }}</td>
+                                    <td class="small">{{ item.lote_id_afectado }}</td>
+                                    <td class="small">{{ item.cultivo_nombre }}</td>
+                                    <td class="small">{{ item.fecha_siembra_registrada|date:"d/m/Y" }}</td>
+                                    <td class="small">{{ item.subsistema_registrado }}</td>
+                                    <td class="small">{{ item.cantidad }}</td>
+                                    <td class="text-muted small">{{ item.detalles|default:"Sin detalles" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">No hay actividad registrada.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th></th>
+                                    <th>Cultivo</th>
+                                    <th>Fecha siembra</th>
+                                    <th>Sistema</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-traspasos" role="tabpanel">
+                    <h5 class="text-dark mb-3">Historial de traspasos</h5>
+                    <div class="table-responsive bg-white rounded shadow-sm">
+                        <table class="table table-hover table-sm mb-0 tabla-compacta tabla-dinamica" id="tabla_historial_traspasos">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="small" style="width: 14%;">Fecha y hora</th>
+                                    <th class="small" style="width: 10%;">ID Lote</th>
+                                    <th class="small" style="width: 18%;">Cultivo (Variedad)</th>
+                                    <th class="small" style="width: 10%;">Fecha siembra</th>
+                                    <th class="small" style="width: 10%;">Fecha traspaso</th>
+                                    <th class="small" style="width: 10%;">Sistema<br>previo</th>
+                                    <th class="small" style="width: 10%;">Sistema<br>posterior</th>
+                                    <th class="small" style="width: 8%; text-align: center;">Cantidad<br>plantas</th>
+                                    <th class="small" style="width: 10%;">Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in traspasos %}
+                                <tr>
+                                    <td class="small">{{ item.fecha_hora|date:"d/m/y H:i" }}</td>
+                                    <td class="small">{{ item.lote_id_afectado }}</td>
+                                    <td class="small">{{ item.cultivo_nombre }}</td>
+                                    <td class="small">{{ item.fecha_siembra_registrada|date:"d/m/Y" }}</td>
+                                    <td class="small">{{ item.fecha_siembra_traspaso|date:"d/m/Y" }}</td>
+                                    <td class="small">{{ item.subsistema_previo }}</td>
+                                    <td class="small">{{ item.subsistema_posterior }}</td>
+                                    <td class="small">{{ item.cantidad }}</td>
+                                    <td class="text-muted small">{{ item.detalles|default:"-" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="9" class="text-center text-muted py-4">No hay traspasos registrados.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th></th>
+                                    <th>Cultivo</th>
+                                    <th>Fecha siembra</th>
+                                    <th>Fecha traspaso</th>
+                                    <th>Sistema previo</th>
+                                    <th>Sistema posterior</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-ediciones" role="tabpanel">
+                    <h5 class="text-dark mb-3">Historial de ediciones</h5>
+                    <div class="table-responsive bg-white rounded shadow-sm">
+                        <table class="table table-hover table-sm mb-0 tabla-compacta tabla-dinamica" id="tabla_historial_ediciones">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="small" style="width: 10%;">Fecha<br>hora</th>
+                                    <th class="small" style="width: 9%;">ID Lote</th>
+                                    <th class="small" style="width: 12%;">Cultivo<br>anterior (Variedad)</th>
+                                    <th class="small" style="width: 12%;">Cultivo<br>nuevo (Variedad)</th>
+                                    <th class="small" style="width: 8%;">Fecha<br>anterior</th>
+                                    <th class="small" style="width: 8%;">Fecha<br>modificada</th>
+                                    <th class="small" style="width: 7%;">Sistema<br>previo</th>
+                                    <th class="small" style="width: 7%;">Sistema<br>posterior</th>
+                                    <th class="small" style="width: 6%;">Cantidad<br>anterior</th>
+                                    <th class="small" style="width: 6%;">Cantidad<br>posterior</th>
+                                    <th class="small" style="width: 15%;">Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in ediciones %}
+                                <tr>
+                                    <td class="small">{{ item.fecha_hora|date:"d/m/y H:i" }}</small></td>
+                                    <td class="small">{{ item.lote_id_afectado }}</small></td>
+                                    <td class="small">{{ item.cultivo_nombre_anterior }}</small></td> <!--Cultivo anterior-->
+                                    <td class="small">{{ item.cultivo_nombre_nuevo }}</small></td> <!--Cultivo nuevo-->
+                                    <td class="small">{{ item.fecha_anterior|date:"d/m/Y" }}</small></td> <!--Fecha siembra anterior-->
+                                    <td class="small">{{ item.fecha_modificada|date:"d/m/Y" }}</small></td> <!--Fecha siembra posterior-->
+                                    <td class="small">{{ item.subsistema_previo }}</small></td> <!--Sistema anterior-->
+                                    <td class="small">{{ item.subsistema_posterior }}</small></td> <!--Sistema posterior-->
+                                    <td class="small">{{ item.cantidad_anterior|default:"-" }}</small></td> <!--Cantidad anterior-->
+                                    <td class="small">{{ item.cantidad_posterior|default:"-" }}</small></td> <!--Cantidad posterior-->
+                                    <td class="text-muted small">{{ item.detalles|default:"-" }}</small></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="11" class="text-center text-muted py-4">No hay ediciones registradas.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th></th>
+                                    <th>Cultivo anterior</th>
+                                    <th>Cultivo nuevo</th>
+                                    <th>Fecha anterior</th>
+                                    <th>Fecha modificada</th>
+                                    <th>Sistema previo</th>
+                                    <th>Sistema posterior</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-cosechas" role="tabpanel">
+                    <h5 class="text-dark mb-3">Historial de cosechas</h5>
+                    <div class="table-responsive bg-white rounded shadow-sm">
+                        <table class="table table-hover table-sm mb-0 tabla-compacta tabla-dinamica" id="tabla_historial_cosechas">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="small" style="width: 10%;">Fecha<br>hora</th>
+                                    <th class="small" style="width: 9%;">ID Lote</th>
+                                    <th class="small" style="width: 12%;">Cultivo<br>(Variedad)</th>
+                                    <th class="small" style="width: 8%;">Fecha<br>siembra</th>
+                                    <th class="small" style="width: 8%;">Fecha<br>traspaso</th>
+                                    <th class="small" style="width: 8%;">Fecha<br>cosecha</th>
+                                    <th class="small" style="width: 7%;">Sistema<br>producción</th>
+                                    <th class="small" style="width: 7%;">No.plantas<br>traspasadas</th>
+                                    <th class="small" style="width: 7%;">No.plantas<br>cosechadas</th>
+                                    <th class="small" style="width: 6%;">Rendimiento (%)</th>
+                                    <th class="small" style="width: 20%;">Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cosechas %}
+                                <tr>
+                                    <td class="small">{{ item.fecha_hora|date:"d/m/y H:i" }}</td>
+                                    <td class="small">{{ item.lote_id_afectado }}</td>
+                                    <td class="small">{{ item.cultivo_nombre }}</td>
+                                    <td class="small">{{ item.fecha_siembra_registrada|date:"d/m/Y" }}</td>
+                                    <td class="small">{{ item.fecha_siembra_traspaso|date:"d/m/Y" }}</td>
+                                    <td class="small">{{ item.fecha_modificada|date:"d/m/Y"|default:"-" }}</td>
+                                    <td class="small">{{ item.subsistema_posterior }}</small></td>
+                                    <td class="small">{{ item.cantidad_anterior|default:"0" }}</td>
+                                    <td class="small">{{ item.cantidad_posterior|default:"0" }}</td>
+                                    <td class="small">{{ item.rendimiento|default:"0" }}%</td>
+                                    <td class="text-muted small">{{ item.detalles|default:"-" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="10" class="text-center text-muted py-4">Aún no hay cosechas registradas.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th></th>
+                                    <th>Cultivo</th>
+                                    <th>Fecha siembra</th>
+                                    <th>Fecha traspaso</th>
+                                    <th>Fecha cosecha</th>
+                                    <th>Sistema producción</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-eliminaciones" role="tabpanel">
+                    <h5 class="text-dark mb-3">Registro de lotes eliminados</h5>
+                    <div class="table-responsive bg-white rounded shadow-sm">
+                        <table class="table table-hover table-sm mb-0 tabla-compacta tabla-dinamica" id="tabla_historial_eliminaciones">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="small" style="width: 12%;">Fecha<br>hora</th>
+                                    <th class="small" style="width: 10%;">ID Lote<br>eliminado</th>
+                                    <th class="small" style="width: 18%;">Cultivo<br>(Variedad)</th>
+                                    <th class="small" style="width: 12%;">Fecha<br>siembra</th>
+                                    <th class="small" style="width: 12%;">Fecha<br>eliminación</th>
+                                    <th class="small" style="width: 10%;">Sistema<br>producción</th>
+                                    <th class="small" style="width: 26%;">Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in eliminaciones %}
+                                <tr>
+                                    <td class="small">{{ item.fecha_hora|date:"d/m/y H:i" }}</td>
+                                    <td class="small">{{ item.lote_id_afectado }}</td>
+                                    <td class="small">{{ item.cultivo_nombre }}</td>
+                                    <td class="small">{{ item.fecha_siembra_registrada|date:"d/m/y" }}</td>
+                                    <td class="small">{{ item.fecha_hora|date:"d/m/y" }}</td>
+                                    <td class="small">{{ item.subsistema_previo }}</td>
+                                    <td class="text-muted small">{{ item.detalles|default:"-" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="7" class="text-center text-muted py-4">No se han eliminado registros.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th></th>
+                                    <th>Cultivo</th>
+                                    <th>Fecha siembra</th>
+                                    <th>Fecha eliminación</th>
+                                    <th>Ubicación</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+
+{% load static %} 
+
+{% block content %}
+<!-- http://127.0.0.1:8000/ -->
+
+
+<div class="container">
+
+    <div class="row g-4">    
+        <div class="col-xl-8 col-lg-7">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0 text-secondary">Panel Operativo</h4>
+                <a href="{% url 'historial' %}" class="btn bg-iica-blue text-white shadow-sm">
+                    <span style="font-size: 1.1rem;">📊</span> Historial y trazabilidad de producción
+                </a>
+            </div>
+            
+            <!--Sección para registro de cultivos-->
+            <div class="card bg-white border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-title text-iica-blue mb-3 fw-bold">➕ Registrar nuevo ciclo de producción</h6>
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="nuevo_cultivo" value="1">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted mb-1">Cultivo</label>
+                                <select name="nombre" class="form-select form-select-sm" required>
+                                    <option value="Lechuga">Lechuga</option>
+                                    <option value="Albahaca">Albahaca</option>
+                                    <option value="Mostaza">Mostaza</option>
+                                    <option value="Menta">Menta</option>
+                                    <option value="Hierbabuena">Hierbabuena</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted mb-1">Sistema</label>
+                                <select name="subsistema" id="select-ubicacion" class="form-select form-select-sm" required>
+                                    <optgroup label="Plantinera">
+                                        <option value="PLA-STD">Plantinera</option>
+                                        <option value="PLA-MICRO">Microgreens</option>
+                                    </optgroup>
+                                    <optgroup label="Maduración">
+                                        <option value="MAD-R1">Maduración Rack I</option>
+                                        <option value="MAD-R2">Maduración Rack II</option>
+                                        <option value="MAD-R3">Maduración Rack III</option>
+                                        <option value="MAD-R4">Maduración Rack IV</option>
+                                    </optgroup>
+                                    <optgroup label="Vertical Wall">
+                                        <option value="VER-1">Vertical Wall I</option>
+                                        <option value="VER-2">Vertical Wall II</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small text-muted mb-1">Variedad</label>
+                                <input type="text" name="variedad" class="form-control form-control-sm" placeholder="Ej: Grand Rapids">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small text-muted mb-1">Fecha siembra</label>
+                                <input type="date" name="fecha_siembra" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label id="label-cantidad" class="form-label small text-muted mb-1">No.Bandejas</label>
+                                <input type="number" name="cantidad_bandejas" class="form-control form-control-sm" value="1" min="1" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-0 align-items-end">
+                            <div class="col-md-9">
+                                <label class="form-label small text-muted mb-1">Detalles del registro</label>
+                                <input type="text" name="observaciones" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <button type="submit" class="btn btn-success btn-sm w-90">Guardar Registro</button>
+                            </div>    
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!--Tablas de registro de sistemas productivos-->
+            <!--Tabla para plantinera/microgreens-->  
+            <div class="border rounded p-3 bg-light mb-4" style="border-left: 4px solid #004379 !important;">
+                <h5 class="fw-bold text-iica-blue border-bottom pb-2 d-flex justify-content-between align-items-center">
+                    <span>Sistema 1: Plantinera / Microgreens</span>
+                    <span class="badge bg-iica-red text-white align-self-center" style="font-size: 0.75rem;">lote(s) {{ count_pla }}</span>
+                </h5>    
+                <h6 class="text-iica-blue fw-bold mb-2">Plantinera</h6>
+                <div class="bg-white rounded shadow-sm mb-4 overflow-hidden">
+                    {% include "tabla_plantinera_partial.html" with lista=pla_std %}
+                </div>
+                <h6 class="text-iica-blue fw-bold mb-2">Microgreens</h6>
+                <div class="bg-white rounded shadow-sm mb-4 overflow-hidden">
+                    {% include "tabla_plantinera_partial.html" with lista=pla_micro %}
+                </div>     
+            </div>
+
+            <!--Tabla para sistema de maduración (Racks)--> 
+            <div class="border rounded p-3 bg-light mb-4" style="border-left: 4px solid #006a5e !important;">
+                <h5 class="fw-bold text-iica-green border-bottom pb-2 d-flex justify-content-between align-items-center">
+                    <span>Sistema 2: Racks Maduración</span>
+                    <span class="badge bg-iica-red text-white align-self-center" style="font-size: 0.75rem;">lote(s) {{ count_mad }}</span>
+                </h5>    
+                <h6 class="text-iica-green fw-bold mb-2">Rack I</h6>
+                <div class="bg-white rounded shadow-sm mb-4 overflow-hidden">
+                    {% include "tabla_produccion_partial.html" with lista=mad_r1 %}
+                </div>
+                <h6 class="text-iica-green fw-bold mb-2">Rack II</h6>
+                <div class="bg-white rounded shadow-sm mb-4 overflow-hidden">
+                    {% include "tabla_produccion_partial.html" with lista=mad_r2 %}
+                </div>
+                <h6 class="text-iica-green fw-bold mb-2">Rack III</h6>
+                <div class="bg-white rounded shadow-sm mb-4 overflow-hidden">
+                    {% include "tabla_produccion_partial.html" with lista=mad_r3 %}
+                </div>
+                <h6 class="text-iica-green fw-bold mb-2">Rack IV</h6>
+                <div class="bg-white rounded shadow-sm mb-4 overflow-hidden">
+                    {% include "tabla_produccion_partial.html" with lista=mad_r4 %}
+                </div>       
+            </div>
+
+            <!--Tabla para sistema vertical wall--> 
+            <div class="border rounded p-3 bg-light mb-4" style="border-left: 4px solid #542d00 !important;">
+                <h5 class="fw-bold text-iica-brown border-bottom pb-2 d-flex justify-content-between align-items-center">
+                    <span>Sistema 3: Vertical Wall</span>
+                    <span class="badge bg-iica-red text-white align-self-center" style="font-size: 0.75rem;">lote(s) {{ count_ver }}</span>
+                </h5>    
+                <h6 class="text-iica-brown fw-bold mb-2">Vertical I</h6>
+                <div class="bg-white rounded shadow-sm mb-4 overflow-hidden">
+                    {% include "tabla_produccion_partial.html" with lista=ver_1 %}
+                </div>
+                <h6 class="text-iica-brown fw-bold mb-2">Vertical II</h6>
+                <div class="bg-white rounded shadow-sm mb-4 overflow-hidden">
+                    {% include "tabla_produccion_partial.html" with lista=ver_2 %}
+                </div>      
+            </div>
+
+        </div> 
+        
+        <div class="col-xl-4 col-lg-5">
+            
+            <!--Tarjeta para tareas operativas-->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-iica-blue text-white fw-bold py-3 d-flex justify-content-between align-items-center">
+                    <span class="mb-0">📋 Resumen del turno</span>
+                </div>
+
+                <div class="card-body p-4">
+                    <h6 class="text-muted mb-2 text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Avance del día</h6>
+                    <div class="d-flex justify-content-between align-items-end mb-1">
+                        <span class="fw-bold text-dark" style="font-size: 2.5rem; line-height: 1;">60<span class="fs-4">%</span></span>
+                        <span class="text-success small fw-bold mb-1">3/5 Completadas</span>
+                    </div>
+                    <div class="progress mb-4 rounded-pill" style="height: 8px;">
+                        <div class="progress-bar bg-iica-green" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <h6 class="text-muted mb-3 text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Estado de Alertas</h6>
+                    
+                    <div class="row g-2 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 border border-danger rounded-3 text-center bg-danger bg-opacity-10">
+                                <div class="fs-3 fw-bold text-danger" style="line-height: 1;">2</div>
+                                <div class="small text-danger fw-bold mt-1">Críticas</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border border-warning rounded-3 text-center bg-warning bg-opacity-10">
+                                <div class="fs-3 fw-bold text-warning text-dark" style="line-height: 1;">4</div>
+                                <div class="small text-warning text-dark fw-bold mt-1">Rutina</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted mb-3 text-uppercase fw-bold border-bottom pb-2" style="font-size: 0.75rem; letter-spacing: 1px;">Foco inmediato</h6>
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item px-0 py-2 border-0 d-flex align-items-start bg-transparent">
+                            <span class="text-danger me-2 mt-1" style="font-size: 0.6rem;">🔴</span>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size: 0.9rem;">Calibrar sensor pH</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Maduración</div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 py-2 border-0 d-flex align-items-start bg-transparent">
+                            <span class="text-danger me-2 mt-1" style="font-size: 0.6rem;">🔴</span>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size: 0.9rem;">Revisar bomba principal</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Sistema general</div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 py-2 border-0 d-flex align-items-start bg-transparent">
+                            <span class="text-danger me-2 mt-1" style="font-size: 0.6rem;">🟡</span>
+                            <div>
+                                <div class="fw-bold text-dark" style="font-size: 0.9rem;">Limpiar filtros</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Vertical Wall</div>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="d-grid mt-2">
+                        <a href="/tareas" class="btn bg-iica-blue text-white fw-bold shadow-sm py-2 rounded-3 d-flex justify-content-center align-items-center">
+                            <span class="me-2">Abrir Centro de Tareas</span>
+                            <span style="font-size: 1.2rem;">➡️</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-dark">🧪 Control de Insumos</h6>
+                </div>
+                <div class="card-body p-0 table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-hover table-sm mb-0 tabla-compacta">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Insumo</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for insumo in insumos %}
+                            <tr>
+                                <td>{{ insumo.nombre }}</td>
+                                <td><strong>{{ insumo.stock_actual }}</strong> <small>{{ insumo.unidad }}</small></td>
+                                <td>
+                                    {% if insumo.stock_actual > insumo.stock_minimo %}
+                                        <span class="badge bg-success bg-opacity-25 text-success">Óptimo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger bg-opacity-25 text-danger">Alerta</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center text-muted py-3">Inventario vacío</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-bottom py-3">
+                    <h6 class="mb-0 fw-bold text-uppercase" style="font-size: 0.8rem;">Últimos Movimientos</h6>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush small">
+                        {% for reg in feed_movimientos %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start py-2">
+                            <div class="ms-2 me-auto">
+                                <div class="text-secondary fw-bold">{{ reg.accion }}</div>
+                                <span class="text-muted" style="font-size: 0.7rem;">{{ reg.timestamp|date:"d/m/Y H:i" }} | Por: {{ reg.firmado_por }}</span>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-center text-muted py-3">Sin actividad reciente</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+    <div></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/cultivos.js' %}"></script>
+
+</body>
+</html>
+{% endblock %}

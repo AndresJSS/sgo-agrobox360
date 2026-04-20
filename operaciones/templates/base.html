@@ -1,0 +1,171 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SGO-CEA | IICA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    
+    <style>
+        .card-header { font-weight: bold; }
+        .bg-gradient-primary { background: linear-gradient(45deg, #004379, #004379); color: white; }
+        .accordion-body { padding: 0; }
+        .table { margin-bottom: 0; }
+        .accordion-item {
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .bg-iica-blue { background-color: #004379 !important; color: white !important; }
+        .text-iica-blue { color: #004379 !important; }
+        .border-iica-blue { border-color: #004379 !important; }
+
+        .bg-iica-green { background-color: #006a5e !important; color: white !important; }
+        .text-iica-green { color: #006a5e !important; }
+        .border-iica-green { border-color: #006a5e !important; }
+
+        .bg-iica-brown { background-color: #542d00 !important; color: white !important; }
+        .text-iica-brown { color: #542d00 !important; }
+        .border-iica-brown { border-color: #542d00 !important; }
+
+        .bg-iica-red { background-color: #8a1602 !important; color: white !important; }
+        .text-iica-red { color: #8a1602 !important; }
+        .border-iica-red { border-color: #8a1602 !important; }
+
+        /* Colorear las cabeceras de las tablas*/
+        thead.bg-iica-blue th { background-color: #004379 !important; color: white !important; }
+        thead.bg-iica-green th { background-color: #006a5e !important; color: white !important; }
+        thead.bg-iica-brown th { background-color: #542d00 !important; color: white !important; }
+        thead.bg-iica-red th { background-color: #8a1602 !important; color: white !important; }
+
+        /* Estilo para las tablas*/
+        .tabla-compacta { font-size: 0.85rem; }
+        .tabla-compacta th, .tabla-compacta td { 
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .btn-accion { 
+            padding: 0.15rem 0.4rem; 
+            font-size: 0.9rem; 
+        }
+        .btn-historial-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .btn-historial-card:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+        .nav-pills .nav-link.active .btn-historial-card{
+            opacity: 1;
+            border-width: 2px !important;
+            box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,.1) !important;
+            background-color: #f8f9fa;
+        }
+        .nav-pills .nav-link {
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Personalización de DataTables */
+        
+        /* 1. Reduce el tamaño de letra general de todo el bloque */
+        .dataTables_wrapper {
+            font-size: 0.85rem; 
+            color: #495057;
+        }
+
+        /* 2. Despega "Mostrar registros" y "Buscar" de los bordes de la caja */
+        .dataTables_wrapper > .row:first-child {
+            /* padding: Arriba Derecha Abajo Izquierda */
+            padding: 10px 10px 10px 10px !important; 
+        }
+
+        /* 3. Despega "Mostrando registros" y "Anterior/Siguiente" de los bordes */
+        .dataTables_wrapper > .row:last-child {
+            padding: 10px 10px 10px 10px !important;
+        }
+
+        /* 4. Hace que las cajas de entrada y botones sean más compactos */
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            font-size: 0.85rem !important;
+            padding: 0.25rem 0.5rem !important;
+            border-radius: 0.3rem;
+            border: 1px solid #ced4da;
+        }
+
+        /* 4.1 Hace que el SELECTOR tenga espacio extra a la derecha para la flecha */
+        .dataTables_wrapper .dataTables_length select {
+            font-size: 0.85rem !important;
+            /* Padding: Arriba Derecha Abajo Izquierda */
+            padding: 0.25rem 1.8rem 0.25rem 0.5rem !important; 
+            border-radius: 0.3rem;
+            border: 1px solid #ced4da;
+        }
+
+        /* 5. Estiliza los botones de paginación para que coincidan con la letra pequeña */
+        .dataTables_wrapper .page-link {
+            font-size: 0.85rem !important;
+            padding: 0.25rem 0.6rem !important;
+        }
+
+        /* Estilo refinado para los filtros en el pie de tabla */
+        tfoot {
+        background-color: #f8f9fa; /* Un gris muy tenue para diferenciarlo del cuerpo */
+        border-top: 2px solid #004379; /* Una línea delgada azul IICA para separar */
+        }
+
+        tfoot select {
+            border: 1px solid #ced4da !important;
+            border-radius: 4px !important;
+            color: #495057 !important;
+            font-weight: normal !important;
+            /* Un toque de sombra al enfocar para que se sienta moderno */
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        tfoot select:focus {
+            border-color: #004379 !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 67, 121, 0.25) !important;
+            outline: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-gradient-primary mb-5 shadow-sm">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand mb-0 h1 d-flex align-items-center">
+                <img src="{% static 'img/iica-logo.svg' %}" alt="Logo IICA" height="40" class="me-3">
+                Sistema de Gestión de Operaciones - AgroBox360
+            </span>
+            <div class="d-flex align-items-center">
+                <img src="{% static 'img/logo-agrobox360.png' %}" alt="Logo del Proyecto" height="45">
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="{% static 'js/main.js' %}?v=1.7"></script>
+
+</body>
+</body>
+</html>
